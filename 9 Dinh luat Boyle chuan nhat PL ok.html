@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng Thí nghiệm Định luật Boyle - Vật lí 12</title>
+    <style>
+        :root {
+            --primary: #1e88e5;
+            --primary-dark: #1565c0;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 15px;
+            line-height: 1.5;
+        }
+
+        .phuoc-loi-banner {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 2px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .home-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-align: center;
+            max-width: 700px;
+            margin: 40px auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .home-card h2 {
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+
+        .home-card p {
+            color: #555;
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+
+        .menu-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .menu-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,30,100,0.15);
+            text-decoration: none;
+        }
+
+        .menu-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .menu-btn.secondary {
+            background-color: #43a047;
+        }
+        .menu-btn.secondary:hover {
+            background-color: #2e7d32;
+        }
+
+        .back-home-bar {
+            margin-bottom: 15px;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            border-bottom: 2px solid #eef2f5;
+            padding-bottom: 5px;
+        }
+
+        .instruments {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #eef7ff;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .meter {
+            text-align: center;
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            min-width: 100px;
+        }
+
+        .meter-label {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .meter-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .cylinder-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 420px;
+            background: #fafafa;
+            border-radius: 8px;
+            position: relative;
+            border: 1px solid #ddd;
+            margin-bottom: 12px;
+            overflow: hidden;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .stand-assembly {
+            position: relative;
+            width: 320px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .side-action-panel {
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 5;
+        }
+
+        .side-action-panel .btn {
+            width: 100%;
+            font-size: 0.75rem;
+            padding: 7px 6px;
+            text-align: center;
+            line-height: 1.2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tripod-base {
+            position: absolute;
+            bottom: 0;
+            width: 160px;
+            height: 12px;
+            background: #444;
+            border-radius: 3px;
+        }
+        .tripod-base::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 8px;
+            width: 12px;
+            height: 5px;
+            background: #222;
+        }
+        .tripod-base::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 8px;
+            width: 12px;
+            height: 5px;
+            background: #222;
+        }
+
+        .steel-rod {
+            position: absolute;
+            bottom: 12px;
+            left: 125px;
+            width: 8px;
+            height: 250px;
+            background: linear-gradient(90deg, #aaa, #eee, #777);
+            border-radius: 2px;
+        }
+
+        .clamp {
+            position: absolute;
+            left: 133px;
+            bottom: 160px;
+            width: 22px;
+            height: 16px;
+            background: #555;
+            border-radius: 3px;
+            z-index: 4;
+        }
+
+        .cylinder {
+            position: absolute;
+            bottom: 15px;
+            left: 155px;
+            width: 70px;
+            height: 180px;
+            border: 3px solid #555;
+            border-bottom: 6px solid #333;
+            background: rgba(225, 245, 254, 0.4);
+            border-radius: 0 0 6px 6px;
+            overflow: visible;
+        }
+
+        #particleCanvas {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .piston {
+            width: 100%;
+            height: 12px;
+            background: #444;
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            border-radius: 2px;
+            z-index: 2;
+            cursor: ns-resize;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: background 0.2s;
+        }
+
+        .piston:hover, .piston.dragging {
+            background: var(--primary);
+        }
+
+        .piston-shaft {
+            position: absolute;
+            bottom: 100%;
+            left: calc(50% - 4px);
+            width: 8px;
+            height: 70px;
+            background: linear-gradient(90deg, #888, #ccc, #666);
+            z-index: 3;
+        }
+
+        .pressure-gauge {
+            position: absolute;
+            bottom: calc(100% + 70px);
+            left: calc(50% - 26px);
+            width: 52px;
+            height: 52px;
+            background: #fff;
+            border: 3px solid #333;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            z-index: 5;
+        }
+
+        .gauge-title {
+            font-size: 0.45rem;
+            font-weight: bold;
+            color: #333;
+            text-transform: uppercase;
+            line-height: 1;
+            margin-bottom: 1px;
+        }
+
+        .gauge-inner-text {
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #d32f2f;
+            text-align: center;
+            line-height: 1;
+        }
+
+        .gauge-unit {
+            font-size: 0.35rem;
+            color: #555;
+        }
+
+        .ruler-ticks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .tick-mark {
+            position: absolute;
+            right: 2px;
+            height: 2px;
+            background-color: #444;
+        }
+
+        .tick-label {
+            position: absolute;
+            right: 12px;
+            transform: translateY(-50%);
+            font-size: 0.55rem;
+            font-weight: bold;
+            color: #1565c0;
+            white-space: nowrap;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            width: 140px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: #eef7ff;
+        }
+
+        .btn-danger {
+            background-color: #e53935;
+        }
+
+        .btn-danger:hover {
+            background-color: #c62828;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 6px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: #f0f4f8;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .conclusion-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .temp-toggle {
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid var(--primary);
+            font-size: 0.7rem;
+            background: white;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .guide-content {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+        }
+        .guide-content h3 {
+            color: var(--primary-dark);
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+        }
+        .guide-content p, .guide-content li {
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 6px;
+        }
+        .guide-content ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="phuoc-loi-banner">PHUOC LOI</div>
+
+<!-- ================= TRANG 1: TRANG CHỦ ================= -->
+<div id="page-home" class="page active">
+    <div class="container">
+        <header>
+            <h1>Ứng dụng Mô phỏng Thí nghiệm Vật lí 12</h1>
+            <p>Khảo sát Định luật Boyle (Quá trình đẳng nhiệt)</p>
+        </header>
+
+        <div class="home-card">
+            <h2>Chào mừng đến với hệ thống mô phỏng</h2>
+            <p>Lựa chọn chức năng bên dưới để bắt đầu tiến hành thí nghiệm ảo hoặc xem chi tiết hướng dẫn thao tác trên mô hình.</p>
+            
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="switchPage('experiment')">Tiến hành thí nghiệm</button>
+                <button class="menu-btn secondary" onclick="switchPage('guide')">Hướng dẫn thao tác</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= TRANG 2: MÔ PHỎNG THÍ NGHIỆM ================= -->
+<div id="page-experiment" class="page">
+    <div class="container">
+        <div class="back-home-bar">
+            <button class="btn btn-outline" onclick="switchPage('home')">← Quay lại Trang chủ</button>
+        </div>
+
+        <header>
+            <h1>Mô phỏng Thí nghiệm Định luật Boyle</h1>
+            <p>Bài 9: Định luật Boyle (Khảo sát quá trình đẳng nhiệt) - Vật lí 12 Kết nối tri thức</p>
+        </header>
+
+        <div class="grid-layout">
+            <div>
+                <div class="card">
+                    <h2>1. Mô phỏng thí nghiệm & Chuyển động nhiệt</h2>
+                    
+                    <div class="instruments">
+                        <div class="meter">
+                            <div class="meter-label">Áp suất (p)</div>
+                            <div class="meter-value" id="disp-p">120 kPa</div>
+                        </div>
+                        <div class="meter">
+                            <div class="meter-label">Thể tích (V)</div>
+                            <div class="meter-value" id="disp-v">10 ml</div>
+                        </div>
+                        <div class="meter">
+                            <div class="meter-label">Nhiệt độ</div>
+                            <div class="meter-value" id="disp-t">27 °C</div>
+                            <button class="temp-toggle" onclick="toggleTempUnit()">Đổi Kelvin (K)</button>
+                        </div>
+                    </div>
+
+                    <div class="cylinder-container">
+                        <div class="stand-assembly">
+                            <div class="side-action-panel">
+                                <button class="btn" onclick="addMeasurement()">Ghi số liệu</button>
+                            </div>
+
+                            <div class="tripod-base"></div>
+                            <div class="steel-rod"></div>
+                            <div class="clamp"></div>
+
+                            <div class="cylinder" id="cylinder-box">
+                                <canvas id="particleCanvas"></canvas>
+                                <div class="ruler-ticks" id="rulerTicks"></div>
+
+                                <div class="piston" id="piston">
+                                    <div class="piston-shaft"></div>
+                                    <div class="pressure-gauge">
+                                        <span class="gauge-title">Áp kế</span>
+                                        <span class="gauge-inner-text" id="gauge-val">120</span>
+                                        <span class="gauge-unit">kPa</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="slider-v">Điều chỉnh piston (V):</label>
+                            <input type="range" id="slider-v" min="10" max="60" value="10" step="1" oninput="updateSimulation()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h2>2. Bảng số liệu thí nghiệm</h2>
+                        <button class="btn btn-danger" style="padding: 3px 6px; font-size: 0.75rem;" onclick="clearTable()">Xóa bảng</button>
+                    </div>
+                    
+                    <p style="font-size: 0.75rem; color: #666; margin-bottom: 6px;">* Thực hiện tối thiểu <b>3 lần đo</b> với các thể tích V khác nhau.</p>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Lần đo</th>
+                                <th>Nhiệt độ T (K)</th>
+                                <th>Thể tích V (ml)</th>
+                                <th>Áp suất p (kPa)</th>
+                                <th>Tích p × V</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>3. Đồ thị biểu diễn quá trình đẳng nhiệt</h2>
+                    
+                    <div class="chart-controls">
+                        <button class="btn btn-outline" id="btn-pv" onclick="selectChart('OpV')">Hệ tọa độ (OpV)</button>
+                        <button class="btn btn-outline" id="btn-pt" onclick="selectChart('OpT')">Hệ tọa độ (OpT)</button>
+                        <button class="btn btn-outline" id="btn-vt" onclick="selectChart('OVT')">Hệ tọa độ (OVT)</button>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="graphCanvas"></canvas>
+                    </div>
+
+                    <div class="conclusion-box" id="conclusion-box">
+                        <strong>Kết luận:</strong> Chọn hệ tọa độ và thực hiện tối thiểu 3 lần đo để xem đồ thị.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= TRANG 3: HƯỚNG DẪN THAO TÁC ================= -->
+<div id="page-guide" class="page">
+    <div class="container">
+        <div class="back-home-bar">
+            <button class="btn btn-outline" onclick="switchPage('home')">← Quay lại Trang chủ</button>
+        </div>
+
+        <header>
+            <h1>Hướng dẫn Thao tác Mô hình Thí nghiệm</h1>
+            <p>Chi tiết cách sử dụng và tiến hành khảo sát Định luật Boyle</p>
+        </header>
+
+        <div class="guide-content">
+            <h2>1. Mục đích thí nghiệm</h2>
+            <p>Khảo sát mối quan hệ giữa áp suất p và thể tích V của một lượng khí xác định khi nhiệt độ không đổi (quá trình đẳng nhiệt), từ đó rút ra nội dung của Định luật Boyle.</p>
+
+            <h2>2. Các bước tiến hành thí nghiệm ảo</h2>
+            <ul>
+                <li><b>Bước 1:</b> Từ trang chủ, chọn nút <b>"Tiến hành thí nghiệm"</b> để chuyển sang khu vực mô phỏng.</li>
+                <li><b>Bước 2:</b> Thay đổi thể tích khí V bằng cách kéo trượt thanh cuộn <b>"Điều chỉnh piston (V)"</b> hoặc trực tiếp nhấn giữ và kéo thả phần thân khối Piston lên xuống.</li>
+                <li><b>Bước 3:</b> Quan sát sự thay đổi giá trị áp suất p hiển thị trên đồng hồ áp kế gắn trực tiếp hoặc ở bảng thông số phía trên.</li>
+                <li><b>Bước 4:</b> Nhấn nút <b>"Ghi số liệu"</b> ở bảng điều khiển bên trái để lưu lại bộ giá trị (V, p) vào bảng số liệu bên phải.</li>
+                <li><b>Bước 5:</b> Thực hiện lặp lại tối thiểu từ 3 lần trở lên ở các mức thể tích khác nhau để hoàn thiện bộ dữ liệu khảo sát.</li>
+            </ul>
+
+            <h2>3. Phân tích kết quả và Đồ thị</h2>
+            <ul>
+                <li>Quan sát tích số p nhân V trong bảng số liệu thấy gần như không đổi, chứng tỏ p tỉ lệ nghịch với V.</li>
+                <li>Chuyển đổi qua lại giữa các hệ tọa độ đồ thị (OpV), (OpT), (OVT) để quan sát dạng đường biểu diễn tương ứng và đọc phần kết luận tổng quát của quá trình đẳng nhiệt.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.remove('active');
+        });
+        document.getElementById('page-' + pageId).classList.add('active');
+        window.scrollTo(0, 0);
+
+        if(pageId === 'experiment') {
+            createRulerTicks();
+            updateSimulation();
+            drawGraph();
+        }
+    }
+
+    const CONSTANT_PV = 1200;
+    const TEMP_CELSIUS = 27; 
+    const TEMP_KELVIN = TEMP_CELSIUS + 273; 
+
+    let isKelvin = false;
+    let measurements = [];
+    let currentChartType = 'OpV';
+
+    const pCanvas = document.getElementById('particleCanvas');
+    const pCtx = pCanvas.getContext('2d');
+    let particles = [];
+    const numParticles = 35; 
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < numParticles; i++) {
+            // Tốc độ vừa phải (vận tốc ngẫu nhiên trong khoảng [-1.2, 1.2])
+            particles.push({
+                x: Math.random() * 55 + 7,
+                y: Math.random() * 110 + 10,
+                vx: (Math.random() - 0.5) * 1.8,
+                vy: (Math.random() - 0.5) * 1.8,
+                radius: 3
+            });
+        }
+    }
+
+    function createRulerTicks() {
+        const rulerContainer = document.getElementById('rulerTicks');
+        if(!rulerContainer) return;
+        rulerContainer.innerHTML = '';
+        const cylinderHeight = document.getElementById('cylinder-box').clientHeight;
+        const pistonHeight = 12;
+        const usableHeight = cylinderHeight - pistonHeight - 14;
+
+        const tickValues = [10, 20, 30, 40, 50, 60];
+        tickValues.forEach(v => {
+            let ratio = (v - 10) / 50;
+            let posY = cylinderHeight - 10 - ratio * usableHeight;
+
+            const tick = document.createElement('div');
+            tick.className = 'tick-mark';
+            tick.style.top = posY + 'px';
+            tick.style.width = (v % 20 === 0) ? '14px' : '8px';
+            rulerContainer.appendChild(tick);
+
+            const label = document.createElement('div');
+            label.className = 'tick-label';
+            label.style.top = posY + 'px';
+            label.textContent = v;
+            rulerContainer.appendChild(label);
+        });
+    }
+
+    function updateParticlesSimulation(gasHeight) {
+        if(!pCanvas) return;
+        pCanvas.width = pCanvas.parentElement.clientWidth;
+        pCanvas.height = pCanvas.parentElement.clientHeight;
+
+        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+        pCtx.fillStyle = '#1e88e5'; // Màu xanh phân tử khí
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Va chạm thành bình bên trái và phải
+            if (p.x - p.radius < 2) { p.x = p.radius + 2; p.vx *= -1; }
+            if (p.x + p.radius > pCanvas.width - 2) { p.x = pCanvas.width - p.radius - 2; p.vx *= -1; }
+            
+            // Va chạm piston phía trên
+            if (p.y - p.radius < pCanvas.height - gasHeight) { 
+                p.y = (pCanvas.height - gasHeight) + p.radius; 
+                p.vy *= -1; 
+            }
+            // Va chạm đáy bình phía dưới
+            if (p.y + p.radius > pCanvas.height - 2) { 
+                p.y = pCanvas.height - p.radius - 2; 
+                p.vy *= -1; 
+            }
+
+            // Vẽ hạt tròn phân tử khí
+            pCtx.beginPath();
+            pCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            pCtx.fill();
+        });
+    }
+
+    // Vòng lặp animation mượt mà cho các hạt phân tử chuyển động
+    function animateParticlesLoop() {
+        const slider = document.getElementById('slider-v');
+        if (slider && document.getElementById('page-experiment').classList.contains('active')) {
+            let v = parseInt(slider.value);
+            const cylinderElem = document.getElementById('cylinder-box');
+            if (cylinderElem) {
+                const cylinderHeight = cylinderElem.clientHeight;
+                const pistonHeight = 12; 
+                const usableHeight = cylinderHeight - pistonHeight - 14; 
+                let ratio = (v - 10) / 50;
+                let pistonBottom = 10 + ratio * usableHeight;
+                updateParticlesSimulation(pistonBottom);
+            }
+        }
+        requestAnimationFrame(animateParticlesLoop);
+    }
+
+    function toggleTempUnit() {
+        isKelvin = !isKelvin;
+        const btn = document.querySelector('.temp-toggle');
+        btn.textContent = isKelvin ? 'Đổi Celsius (°C)' : 'Đổi Kelvin (K)';
+        updateSimulation();
+    }
+
+    function updateSimulation() {
+        const slider = document.getElementById('slider-v');
+        if(!slider) return;
+        let v = parseInt(slider.value);
+        let p = Math.round(CONSTANT_PV / v);
+
+        document.getElementById('disp-v').innerText = v + ' ml';
+        document.getElementById('disp-p').innerText = p + ' kPa';
+        document.getElementById('gauge-val').innerText = p;
+        
+        if (isKelvin) {
+            document.getElementById('disp-t').innerText = TEMP_KELVIN + ' K';
+        } else {
+            document.getElementById('disp-t').innerText = TEMP_CELSIUS + ' °C';
+        }
+
+        const cylinderElem = document.getElementById('cylinder-box');
+        const cylinderHeight = cylinderElem.clientHeight;
+        const pistonHeight = 12; 
+        const usableHeight = cylinderHeight - pistonHeight - 14; 
+        
+        let ratio = (v - 10) / 50;
+        let pistonBottom = 10 + ratio * usableHeight;
+
+        document.getElementById('piston').style.bottom = pistonBottom + 'px';
+    }
+
+    const pistonElem = document.getElementById('piston');
+    let isDragging = false;
+    let startY = 0;
+    let startV = 10;
+
+    function handleDragStart(clientY) {
+        isDragging = true;
+        pistonElem.classList.add('dragging');
+        startY = clientY;
+        const slider = document.getElementById('slider-v');
+        startV = parseInt(slider.value);
+    }
+
+    function handleDragMove(clientY) {
+        if (!isDragging) return;
+        const deltaY = startY - clientY; 
+        const cylinderBox = document.getElementById('cylinder-box');
+        const cylinderHeight = cylinderBox.clientHeight;
+        const pistonHeight = 12;
+        const usableHeight = cylinderHeight - pistonHeight - 14;
+
+        let deltaV = (deltaY / usableHeight) * 50;
+        let newV = Math.round(startV + deltaV);
+
+        if (newV < 10) newV = 10;
+        if (newV > 60) newV = 60;
+
+        document.getElementById('slider-v').value = newV;
+        updateSimulation();
+    }
+
+    function handleDragEnd() {
+        if (isDragging) {
+            isDragging = false;
+            pistonElem.classList.remove('dragging');
+        }
+    }
+
+    if(pistonElem) {
+        pistonElem.addEventListener('mousedown', (e) => {
+            handleDragStart(e.clientY);
+            e.preventDefault();
+        });
+    }
+    window.addEventListener('mousemove', (e) => {
+        if (isDragging) handleDragMove(e.clientY);
+    });
+    window.addEventListener('mouseup', handleDragEnd);
+
+    if(pistonElem) {
+        pistonElem.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 0) {
+                handleDragStart(e.touches[0].clientY);
+                e.preventDefault();
+            }
+        }, {passive: false});
+    }
+
+    window.addEventListener('touchmove', (e) => {
+        if (isDragging && e.touches.length > 0) {
+            handleDragMove(e.touches[0].clientY);
+            e.preventDefault();
+        }
+    }, {passive: false});
+
+    window.addEventListener('touchend', handleDragEnd);
+
+    function addMeasurement() {
+        const slider = document.getElementById('slider-v');
+        let v = parseInt(slider.value);
+        let p = Math.round(CONSTANT_PV / v);
+
+        if (measurements.some(m => m.v === v)) {
+            alert('Thể tích này đã được ghi vào bảng số liệu!');
+            return;
+        }
+
+        measurements.push({
+            id: measurements.length + 1,
+            t: TEMP_KELVIN,
+            v: v,
+            p: p,
+            pv: p * v
+        });
+
+        measurements.sort((a, b) => a.v - b.v);
+        measurements.forEach((m, index) => m.id = index + 1);
+
+        renderTable();
+        drawGraph();
+    }
+
+    function clearTable() {
+        measurements = [];
+        renderTable();
+        drawGraph();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+
+        if (measurements.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="color:#888;">Chưa có số liệu thí nghiệm</td></tr>`;
+            return;
+        }
+
+        measurements.forEach(m => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>Lần ${m.id}</td>
+                <td>${m.t}</td>
+                <td>${m.v}</td>
+                <td>${m.p}</td>
+                <td><b>${m.pv}</b></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function selectChart(type) {
+        currentChartType = type;
+        
+        document.getElementById('btn-pv').className = 'btn ' + (type === 'OpV' ? '' : 'btn-outline');
+        document.getElementById('btn-pt').className = 'btn ' + (type === 'OpT' ? '' : 'btn-outline');
+        document.getElementById('btn-vt').className = 'btn ' + (type === 'OVT' ? '' : 'btn-outline');
+
+        drawGraph();
+    }
+
+    function drawArrow(ctx, fromX, fromY, toX, toY) {
+        const headLength = 8;
+        const angle = Math.atan2(toY - fromY, toX - fromX);
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(toX, toY);
+        ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
+        ctx.stroke();
+    }
+
+    function drawGraph() {
+        const canvas = document.getElementById('graphCanvas');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+
+        const w = canvas.width;
+        const h = canvas.height;
+        const pad = 45;
+
+        ctx.clearRect(0, 0, w, h);
+
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+
+        drawArrow(ctx, pad, h - pad, pad, pad / 2 - 5);
+        drawArrow(ctx, pad, h - pad, w - pad / 2 + 5, h - pad);
+
+        ctx.font = '11px Arial';
+        ctx.fillStyle = '#333';
+        ctx.fillText('O', pad - 12, h - pad + 14);
+
+        const conclusionBox = document.getElementById('conclusion-box');
+
+        let maxX = 70, maxY = 140;
+
+        if (currentChartType === 'OpV') {
+            ctx.fillText('p (kPa)', pad - 35, pad / 2 - 2);
+            ctx.fillText('V (ml)', w - pad / 2 - 5, h - pad + 22);
+
+            maxX = 70; 
+            maxY = 140; 
+
+            if (measurements.length < 3) {
+                conclusionBox.innerHTML = `<strong>Kết luận (Hệ OpV):</strong> Cần tối thiểu 3 điểm số liệu để hiển thị kết luận.`;
+            } else {
+                conclusionBox.innerHTML = `<strong>Kết luận:</strong> Biểu diễn quá trình đẳng nhiệt trong hệ tọa độ (OpV) là một nhánh của đường cong Hypebol (đường cong này gọi là đường đẳng nhiệt). Khi thể tích V tăng bao nhiêu lần thì áp suất p giảm bấy nhiêu lần và ngược lại, nhưng tích p.V = hằng số. Vậy, ở nhiệt độ không đổi (quá trình đẳng nhiệt) của một lượng khí xác định thì áp suất p tỉ lệ nghịch với thể tích V.`;
+            }
+        } else if (currentChartType === 'OpT') {
+            ctx.fillText('p (kPa)', pad - 35, pad / 2 - 2);
+            ctx.fillText('T (K)', w - pad / 2 - 5, h - pad + 22);
+
+            maxX = 400; 
+            maxY = 140; 
+
+            if (measurements.length < 3) {
+                conclusionBox.innerHTML = `<strong>Kết luận (Hệ OpT):</strong> Cần tối thiểu 3 điểm số liệu để hiển thị kết luận.`;
+            } else {
+                conclusionBox.innerHTML = `<strong>Kết luận:</strong> Biểu diễn quá trình đẳng nhiệt trong hệ tọa độ (OpT) là một đường thẳng vuông góc với trục OT và song song với trục còn lại là Op.`;
+            }
+        } else if (currentChartType === 'OVT') {
+            ctx.fillText('V (ml)', pad - 35, pad / 2 - 2);
+            ctx.fillText('T (K)', w - pad / 2 - 5, h - pad + 22);
+
+            maxX = 400; 
+            maxY = 70;  
+
+            if (measurements.length < 3) {
+                conclusionBox.innerHTML = `<strong>Kết luận (Hệ OVT):</strong> Cần tối thiểu 3 điểm số liệu để hiển thị kết luận.`;
+            } else {
+                conclusionBox.innerHTML = `<strong>Kết luận:</strong> Biểu diễn quá trình đẳng nhiệt trong hệ tọa độ (OVT) là một đường thẳng vuông góc với trục OT và song song với trục còn lại là OV.`;
+            }
+        }
+
+        function toCanvasX(val) {
+            return pad + (val / maxX) * (w - 2 * pad);
+        }
+        function toCanvasY(val) {
+            return (h - pad) - (val / maxY) * (h - 2 * pad);
+        }
+
+        ctx.font = '9px Arial';
+        ctx.fillStyle = '#555';
+        ctx.lineWidth = 1;
+
+        if (currentChartType === 'OpV' || currentChartType === 'OpT') {
+            [20, 40, 60, 80, 100, 120, 140].forEach(val => {
+                let cy = toCanvasY(val);
+                ctx.beginPath();
+                ctx.moveTo(pad - 4, cy);
+                ctx.lineTo(pad, cy);
+                ctx.stroke();
+                ctx.fillText(val, pad - 28, cy + 3);
+            });
+        }
+
+        if (currentChartType === 'OVT') {
+            [10, 20, 30, 40, 50, 60, 70].forEach(val => {
+                let cy = toCanvasY(val);
+                ctx.beginPath();
+                ctx.moveTo(pad - 4, cy);
+                ctx.lineTo(pad, cy);
+                ctx.stroke();
+                ctx.fillText(val, pad - 24, cy + 3);
+            });
+        }
+
+        if (currentChartType === 'OpV') {
+            [10, 20, 30, 40, 50, 60, 70].forEach(val => {
+                let cx = toCanvasX(val);
+                ctx.beginPath();
+                ctx.moveTo(cx, h - pad);
+                ctx.lineTo(cx, h - pad + 4);
+                ctx.stroke();
+                ctx.fillText(val, cx - 6, h - pad + 14);
+            });
+        } else if (currentChartType === 'OpT' || currentChartType === 'OVT') {
+            [100, 200, 300, 400].forEach(val => {
+                let cx = toCanvasX(val);
+                ctx.beginPath();
+                ctx.moveTo(cx, h - pad);
+                ctx.lineTo(cx, h - pad + 4);
+                ctx.stroke();
+                ctx.fillText(val, cx - 10, h - pad + 14);
+            });
+        }
+
+        if (measurements.length < 3) return;
+
+        ctx.strokeStyle = '#1e88e5';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        if (currentChartType === 'OpV') {
+            for (let v = 10; v <= 65; v += 0.5) {
+                let p = CONSTANT_PV / v;
+                let cx = toCanvasX(v);
+                let cy = toCanvasY(p);
+                if (v === 10) ctx.moveTo(cx, cy);
+                else ctx.lineTo(cx, cy);
+            }
+            ctx.stroke();
+
+            measurements.forEach(m => {
+                let cx = toCanvasX(m.v);
+                let cy = toCanvasY(m.p);
+
+                ctx.setLineDash([2, 2]);
+                ctx.strokeStyle = '#ffa726';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx, h - pad); 
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(pad, cy);    
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#1e88e5';
+                ctx.fill();
+            });
+
+        } else if (currentChartType === 'OpT') {
+            let cx = toCanvasX(TEMP_KELVIN);
+            ctx.beginPath();
+            ctx.moveTo(cx, toCanvasY(20));
+            ctx.lineTo(cx, toCanvasY(140));
+            ctx.stroke();
+
+            measurements.forEach(m => {
+                let cy = toCanvasY(m.p);
+
+                ctx.setLineDash([2, 2]);
+                ctx.strokeStyle = '#ffa726';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(pad, cy);        
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx, h - pad);    
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#1e88e5';
+                ctx.fill();
+            });
+
+        } else if (currentChartType === 'OVT') {
+            let cx = toCanvasX(TEMP_KELVIN);
+            ctx.beginPath();
+            ctx.moveTo(cx, toCanvasY(10));
+            ctx.lineTo(cx, toCanvasY(70));
+            ctx.stroke();
+
+            measurements.forEach(m => {
+                let cy = toCanvasY(m.v);
+
+                ctx.setLineDash([2, 2]);
+                ctx.strokeStyle = '#ffa726';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(pad, cy);        
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx, h - pad);    
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#1e88e5';
+                ctx.fill();
+            });
+        }
+    }
+
+    window.onload = function() {
+        initParticles();
+        animateParticlesLoop();
+    };
+
+    window.onresize = function() {
+        createRulerTicks();
+        updateSimulation();
+        drawGraph();
+    };
+</script>
+</body>
+</html>
